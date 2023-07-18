@@ -65,10 +65,10 @@ def minettest():
     try:
         subprocess.run(["minet", "--version"], capture_output=True)
     except FileNotFoundError:
-        raise RuntimeError("Minet n'est pas installé")
-        # args = "curl -sSL https://raw.githubusercontent.com/medialab/minet/master/scripts/install.sh | bash".split(" ")
-        # subprocess.run(args, capture_output=True)
-
+        raise RuntimeError("Minet n'est pas installé ou n'est pas dans le PATH, veuillez exécuter:\n"
+                           "pip install minet\n"
+                           "ou\n"
+                           "pipx install minet")
 
 def get(media: str, key: str):
     return config[media][key]
@@ -105,6 +105,8 @@ def recover_cookies(media: str):
         raise RuntimeError(
             f"Aucun cookie trouvé pour {media} veillez à vous connecter sur https://www.{media}.com puis réessayez.\n(Navigateurs supportés : {bros})")
 
+    cookie = cookie.replace("\n", " ")
+
     set(media, "cookie", cookie)
     save()
 
@@ -130,7 +132,9 @@ def main(query: list = None):
         raise NotImplementedError
 
     actualcookie = get(media, key)
-    if actualcookie.startswith("MY_") or actualcookie == "":
+    try:
+        CookieChecker(actualcookie, media)
+    except (UndefinedCookie, NotLoggedIn):
         recover_cookies(media)
 
     if len(args) == 1:
