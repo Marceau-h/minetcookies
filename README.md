@@ -11,6 +11,9 @@
 - [License](#license)
 - [Description](#description)
 - [Usage](#usage)
+  - [Examples](#examples)
+    - [Full commands](#full-commands)
+    - [Cookies only](#cookies-only)
 - [Medias supported](#medias-supported)
 - [Browsers supported](#browsers-supported)
 
@@ -28,11 +31,11 @@ pip install minetcookies
 
 ## Description
 
-Minet cookies is a cookie manager for Minet.
-It checks for cookies by using the minet cli ant then writes them to the minet config file.
+`minetcookies` is a cookie manager for [Minet](https://github.com/medialab/minet).
+It checks for cookies by using the minet cli ant then writes them to the Minet config file.
 Preventing you from doing it manually.
 
-Adittionally, it can also read minet commands, in that case, it will check for cookies and then return a folder path 
+Additionally, it can also read minet commands, in that case, it will check for cookies and then return a folder path 
 based on the curent directory and the keyword. This is useful for chaining commands.
 
 CAUTION: For this script to work, you need to have one of the supported browsers installed and be logged in to the
@@ -46,6 +49,24 @@ minetcookies [media]
 or
 ```bash
 minetcookies [minet command]
+```
+
+### Examples
+
+#### Full commands
+
+```bash
+minetcookies tiktok search-videos test -l 20
+```
+OR 
+```bash
+minet twitter scrape tweets test --limit 20
+```
+
+#### Cookies only
+
+```bash
+minetcookies [tiktok|twitter|facebook|instagram]
 ```
 
 ## Medias supported
