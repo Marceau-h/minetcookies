@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 import yaml
-
+from tqdm.auto import tqdm
 
 default_yaml = """
 ---
@@ -47,7 +47,7 @@ class NotLoggedIn(Exception):
     pass
 
 
-def CookieChecker(cookie:str, media:str):
+def CookieChecker(cookie: str, media: str):
     media_spec = {
         "twitter": "_twitter_sess=",
         "instagram": "sessionid=",  # "ds_user_id="
@@ -66,9 +66,8 @@ def minettest():
         subprocess.run(["minet", "--version"], capture_output=True)
     except FileNotFoundError:
         raise RuntimeError("Minet n'est pas installé ou n'est pas dans le PATH, veuillez exécuter:\n"
-                           "pip install minet\n"
-                           "ou\n"
-                           "pipx install minet")
+                           "pip install minet")
+
 
 def get(media: str, key: str):
     return config[media][key]
@@ -84,14 +83,26 @@ def save():
 
 def recover_cookies(media: str):
     bros = ['chrome', 'firefox', 'chromium', 'edge']
+    prefixes = ["", "www."]
+
+    combinations = tqdm(
+        [(b, p) for b in bros for p in prefixes],
+        desc="Recherche des cookies dans les navigateurs"
+    )
+
     loggedout = False
-    for navigator in bros:
-        cookie = subprocess.run(["minet", "cookies", navigator, "--url", f"https://www.{media}.com"],
-                                capture_output=True)
+
+    for browser, prefix in combinations:
+        combinations.set_description(f"Recherche des cookies dans {browser}")
+        cookie = subprocess.run(
+            ["minet", "cookies", browser, "--url", f"https://{prefix}{media}.com"],
+            capture_output=True
+        )
         cookie = cookie.stdout.decode("utf-8").strip()
 
         try:
             CookieChecker(cookie, media)
+            combinations.close()
             break
         except UndefinedCookie:
             continue
@@ -101,9 +112,11 @@ def recover_cookies(media: str):
     else:
         if loggedout:
             raise RuntimeError(
-                f"Vous êtes déconnecté de {media}.com veillez à vous connecter puis réessayez.\n(Navigateurs supportés : {bros})")
+                f"Vous êtes déconnecté de {media}.com veillez à vous connecter puis réessayez."
+                f"\n(Navigateurs supportés : {bros})")
         raise RuntimeError(
-            f"Aucun cookie trouvé pour {media} veillez à vous connecter sur https://www.{media}.com puis réessayez.\n(Navigateurs supportés : {bros})")
+            f"Aucun cookie trouvé pour {media} veillez à vous connecter sur "
+            f"https://www.{media}.com puis réessayez.\n(Navigateurs supportés : {bros})")
 
     cookie = cookie.replace("\n", " ")
 

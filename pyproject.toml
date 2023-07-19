@@ -5,7 +5,6 @@ build-backend = "hatchling.build"
 [project]
 name = "minetcookies"
 dynamic = ["version"]
-#version = "0.0.4"
 description = 'A simple cookie manager for Minet by Medialab'
 readme = "README.md"
 requires-python = ">=3.7"
@@ -33,6 +32,7 @@ classifiers = [
 dependencies = [
     "minet~=0.67.1",
     "PyYAML~=6.0",
+    "tqdm~=2.2.0",
 ]
 
 
